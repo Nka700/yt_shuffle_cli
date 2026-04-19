@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+
+# ビルド成果物
+dist/
+build/
+
+# テストキャッシュ
+.pytest_cache/
+.hypothesis/
+
+# エディタ・IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Kiro（設定ファイルのみ除外）
+.kiro/specs/*/.config.kiro

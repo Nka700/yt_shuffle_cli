@@ -1,0 +1,24 @@
+# Note: shebang (without kind of '#!/bin/bash' or '#set -o nounset')
+#       this is a simple script to load environment variables by source command
+KEY_API_YOUTUBE=$(< ~/.ssh/key_api_youtube)
+CHANNELID_API_YOUTUBE=$(< ~/.ssh/channelid_api_youtube)
+
+PLAYLISTS_JSON=$(curl -s \
+  "https://youtube.googleapis.com/youtube/v3/playlists?part=id,snippet&channelId=${CHANNELID_API_YOUTUBE}&maxResults=50&key=${KEY_API_YOUTUBE}" \
+  --header 'Accept: application/json')
+
+echo "YouTube Music Playlists:"
+echo "----------------------------"
+
+while IFS=$'\t' read -r title id; do
+  safe_name=$(echo "$title" | tr '[:lower:]' '[:upper:]' | tr -cs 'A-Z0-9_' '_' | sed 's/^/YTM_/')
+  export "${safe_name}=${id}"
+  printf "%-30s = %s\n" "$safe_name" "$id"
+done < <(
+  echo "${PLAYLISTS_JSON}" | jq -r '
+    .items[] |
+    [.snippet.title, .id] | @tsv
+  '
+)
+
+echo "YouTube Music playlist variables loaded into current shell."
