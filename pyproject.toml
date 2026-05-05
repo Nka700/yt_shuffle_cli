@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ytm"
-version = "1.0.0"
+version = "1.1.0"
 description = "YouTube Music CLI ユーティリティ — プレイリスト一覧表示とシャッフル音声再生"
 readme = "USAGE.md"
 requires-python = ">=3.8"

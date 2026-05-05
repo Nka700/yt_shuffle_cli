@@ -25,22 +25,21 @@ from pathlib import Path
 # 設定
 # ---------------------------------------------------------------------------
 
-def _read_secret(filename: str) -> str:
-    """~/.ssh/ 配下の認証情報ファイルを読み取る"""
-    path = Path.home() / ".ssh" / filename
-    try:
-        return path.read_text().strip()
-    except FileNotFoundError:
-        print(f"エラー: 認証情報ファイルが見つかりません: {path}", file=sys.stderr)
+def _get_env(name: str) -> str:
+    """環境変数から認証情報を取得する。未設定ならエラー終了"""
+    value = os.environ.get(name)
+    if not value:
+        print(f"エラー: 環境変数 {name} が設定されていません。", file=sys.stderr)
         sys.exit(1)
+    return value
 
 
 def get_api_key() -> str:
-    return _read_secret("key_api_youtube")
+    return _get_env("KEY_API_YOUTUBE")
 
 
 def get_channel_id() -> str:
-    return _read_secret("channelid_api_youtube")
+    return _get_env("CHANNELID_API_YOUTUBE")
 
 
 # ---------------------------------------------------------------------------

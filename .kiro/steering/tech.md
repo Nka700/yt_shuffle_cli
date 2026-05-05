@@ -30,8 +30,8 @@
 
 ## 認証情報
 
-- `~/.ssh/key_api_youtube` — YouTube API キー
-- `~/.ssh/channelid_api_youtube` — チャンネル ID
+- `$KEY_API_YOUTUBE` — YouTube API キー（環境変数）
+- `$CHANNELID_API_YOUTUBE` — チャンネル ID（環境変数）
 
 ## クッキー（オプション）
 

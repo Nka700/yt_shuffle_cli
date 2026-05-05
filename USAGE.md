@@ -4,13 +4,13 @@ YouTube Music CLI ユーティリティ。プレイリストの一覧表示と�
 
 ## 前提条件
 
-| 項目 | 説明 |
-|------|------|
-| Python 3.8+ | 実行環境 |
-| mpv | 音声再生 |
-| yt-dlp | YouTube 音声ストリーミング（mpv の ytdl_hook 経由） |
-| YouTube API キー | `~/.ssh/key_api_youtube` に配置 |
-| 自分のアカウントのチャンネル ID | `~/.ssh/channelid_api_youtube` に配置 |
+| 項目                            | 説明                                                |
+|---------------------------------|-----------------------------------------------------|
+| Python 3.8+                     | 実行環境                                            |
+| mpv                             | 音声再生                                            |
+| yt-dlp                          | YouTube 音声ストリーミング（mpv の ytdl_hook 経由） |
+| `$KEY_API_YOUTUBE`              | YouTube API キー（環境変数）                        |
+| `$CHANNELID_API_YOUTUBE`        | チャンネル ID（環境変数）                           |
 
 ### オプション
 

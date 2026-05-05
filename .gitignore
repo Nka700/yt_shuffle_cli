@@ -22,3 +22,6 @@ build/
 
 # Kiro（設定ファイルのみ除外）
 .kiro/specs/*/.config.kiro
+
+# Ignore python cache
+**/__pycache__/**
