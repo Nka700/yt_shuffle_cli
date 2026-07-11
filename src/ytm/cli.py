@@ -293,6 +293,7 @@ def cmd_play(args: argparse.Namespace) -> None:
     mpv_cmd = [
         "mpv",
         f"--log-file={log_file}",
+        "--no-config",
         "--no-video",
         "--shuffle",
         "--ytdl-format=bestaudio",
