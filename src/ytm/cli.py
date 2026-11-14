@@ -162,7 +162,7 @@ def cmd_playlists(args: argparse.Namespace) -> None:
         for pl in playlists:
             varname = to_shell_varname(pl["title"])
             print(f"  {varname:<40s} {pl['id']}")
-        print(f"\n合計: {len(playlists)} 件")
+        print(f"\nSum: {len(playlists)} Playlists")
 
 
 # ---------------------------------------------------------------------------

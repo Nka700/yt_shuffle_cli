@@ -1,0 +1,14 @@
+# ytm 開発用の依存関係
+# 実行時の pip 依存はなし（標準ライブラリのみ）。mpv / yt-dlp は別途インストールする。
+#
+# 使い方: pip install -r requirements.txt
+
+# ytm 本体を editable install（tests が `import ytm` するため必要）
+-e .
+
+# テスト
+pytest
+hypothesis
+
+# パッケージビルド（python3 -m build）
+build
