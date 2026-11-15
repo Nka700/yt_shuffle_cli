@@ -20,16 +20,16 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 
-
 # ---------------------------------------------------------------------------
 # 設定
 # ---------------------------------------------------------------------------
+
 
 def _get_env(name: str) -> str:
     """環境変数から認証情報を取得する。未設定ならエラー終了"""
     value = os.environ.get(name)
     if not value:
-        print(f"エラー: 環境変数 {name} が設定されていません。", file=sys.stderr)
+        print(f"Error: environment variable {name} is not set.", file=sys.stderr)
         sys.exit(1)
     return value
 
@@ -46,6 +46,7 @@ def get_channel_id() -> str:
 # YouTube Data API
 # ---------------------------------------------------------------------------
 
+
 def youtube_api_get(endpoint: str, params: dict) -> dict:
     """YouTube Data API v3 に GET リクエストを送る"""
     query = urllib.parse.urlencode(params)
@@ -56,10 +57,10 @@ def youtube_api_get(endpoint: str, params: dict) -> dict:
             return json.loads(resp.read().decode())
     except urllib.error.HTTPError as e:
         body = e.read().decode() if e.fp else ""
-        print(f"APIエラー (HTTP {e.code}): {body}", file=sys.stderr)
+        print(f"API Error (HTTP {e.code}): {body}", file=sys.stderr)
         sys.exit(1)
     except urllib.error.URLError as e:
-        print(f"ネットワークエラー: {e.reason}", file=sys.stderr)
+        print(f"Network Error: {e.reason}", file=sys.stderr)
         sys.exit(1)
 
 
@@ -70,7 +71,10 @@ def _check_ytdlp_version() -> None:
     """yt-dlp のバージョンを確認し、古い場合は警告する"""
     try:
         result = subprocess.run(
-            ["yt-dlp", "--version"], capture_output=True, text=True, timeout=5,
+            ["yt-dlp", "--version"],
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if result.returncode == 0:
             version = result.stdout.strip()
@@ -80,9 +84,9 @@ def _check_ytdlp_version() -> None:
                 age_days = (datetime.now() - ver_date).days
                 if age_days > 90:
                     print(
-                        f"⚠️  yt-dlp のバージョンが古いです ({version}, {age_days}日前)\n"
-                        f"   YouTubeの変更により再生に失敗する可能性があります。\n"
-                        f"   更新: pip install -U yt-dlp  または  yt-dlp -U\n",
+                        f"WARNING: yt-dlp version is old ({version}, {age_days} days ago)\n"
+                        f"  Due to changes on YouTube, playback may fail.\n"
+                        f"  Update: pip install -U yt-dlp  or  yt-dlp -U\n",
                         file=sys.stderr,
                     )
             except ValueError:
@@ -102,6 +106,7 @@ def _cookies_args() -> list[str]:
 # playlists サブコマンド
 # ---------------------------------------------------------------------------
 
+
 def fetch_all_playlists(channel_id: str, api_key: str) -> list[dict]:
     """ページネーション対応で全プレイリストを取得する"""
     playlists = []
@@ -120,10 +125,12 @@ def fetch_all_playlists(channel_id: str, api_key: str) -> list[dict]:
         data = youtube_api_get("playlists", params)
 
         for item in data.get("items", []):
-            playlists.append({
-                "title": item["snippet"]["title"],
-                "id": item["id"],
-            })
+            playlists.append(
+                {
+                    "title": item["snippet"]["title"],
+                    "id": item["id"],
+                }
+            )
 
         page_token = data.get("nextPageToken")
         if not page_token:
@@ -148,7 +155,7 @@ def cmd_playlists(args: argparse.Namespace) -> None:
     playlists = fetch_all_playlists(channel_id, api_key)
 
     if not playlists:
-        print("プレイリストが見つかりませんでした。", file=sys.stderr)
+        print("The playlist could not be found.", file=sys.stderr)
         return
 
     if args.export:
@@ -169,16 +176,20 @@ def cmd_playlists(args: argparse.Namespace) -> None:
 # プレイリスト名前解決
 # ---------------------------------------------------------------------------
 
+
 def _print_resolved(playlist: dict) -> None:
     """解決されたプレイリスト情報を stderr に表示する。"""
-    print(f'🎵 プレイリスト解決: "{playlist["title"]}" ({playlist["id"]})', file=sys.stderr)
+    print(
+        f'Resolved playlist: "{playlist["title"]}" ({playlist["id"]})',
+        file=sys.stderr,
+    )
 
 
 def _print_no_match_error(name: str, playlists: list) -> None:
     """一致しなかった場合のエラーメッセージと利用可能なプレイリスト一覧を stderr に表示し終了する。"""
-    print(f'エラー: "{name}" に一致するプレイリストが見つかりません。', file=sys.stderr)
+    print(f'Error: no playlist matches "{name}".', file=sys.stderr)
     print(file=sys.stderr)
-    print("利用可能なプレイリスト:", file=sys.stderr)
+    print("Available playlists:", file=sys.stderr)
     for pl in playlists:
         varname = to_shell_varname(pl["title"])
         print(f"  {varname:<40s} {pl['title']}", file=sys.stderr)
@@ -224,6 +235,7 @@ def resolve_playlist_id(name: str) -> str:
 # play サブコマンド
 # ---------------------------------------------------------------------------
 
+
 def cmd_play(args: argparse.Namespace) -> None:
     # プレイリスト名/IDを解決
     playlist_id = resolve_playlist_id(args.playlist)
@@ -231,7 +243,10 @@ def cmd_play(args: argparse.Namespace) -> None:
     # 依存コマンドの存在確認
     for cmd in ("yt-dlp", "mpv"):
         if not shutil.which(cmd):
-            print(f"エラー: {cmd} が見つかりません。インストールしてください。", file=sys.stderr)
+            print(
+                f"Error: {cmd} not found. Please install it.",
+                file=sys.stderr,
+            )
             sys.exit(1)
 
     _check_ytdlp_version()
@@ -240,7 +255,7 @@ def cmd_play(args: argparse.Namespace) -> None:
     cookies = _cookies_args()
 
     # プレイリスト情報を表示
-    print("プレイリスト情報を取得中...")
+    print("Fetching playlist info...")
     try:
         yt_cmd = ["yt-dlp", "--flat-playlist", "--dump-json"] + cookies + [playlist_url]
         result = subprocess.run(yt_cmd, capture_output=True, text=True, timeout=120)
@@ -251,36 +266,39 @@ def cmd_play(args: argparse.Namespace) -> None:
                 try:
                     entry = json.loads(line)
                     idx = entry.get("playlist_index", "?")
-                    title = entry.get("title", "(不明)")
+                    title = entry.get("title", "(unknown)")
                     total += 1
                     if title in ("[Deleted video]", "[Private video]"):
                         unavailable += 1
-                        print(f"  [{idx}] {title} (スキップ)")
+                        print(f"  [{idx}] {title} (skipped)")
                     else:
                         print(f"  [{idx}] {title}")
                 except json.JSONDecodeError:
                     continue
             if unavailable:
-                print(f"\n  ※ {unavailable}/{total} 件の動画が利用不可")
+                print(f"\n  Note: {unavailable}/{total} videos are unavailable")
         else:
             stderr_msg = result.stderr.strip()
             if "Sign in" in stderr_msg or "bot" in stderr_msg:
                 print(
-                    "⚠️ YouTubeのボット検出に引っかかっています。\n"
-                    "   対処法:\n"
-                    "   1. yt-dlp を最新版に更新: pip install -U yt-dlp\n"
-                    "   2. ブラウザのクッキーを使用:\n"
-                    f"      yt-dlp --cookies-from-browser chrome --cookies {COOKIES_PATH}\n"
-                    f"      (クッキーは {COOKIES_PATH} に保存されます)",
+                    "WARNING: YouTube bot detection was triggered.\n"
+                    "  What to do:\n"
+                    "  1. Update yt-dlp: pip install -U yt-dlp\n"
+                    "  2. Use browser cookies:\n"
+                    f"     yt-dlp --cookies-from-browser chrome --cookies {COOKIES_PATH}\n"
+                    f"     (cookies are saved to {COOKIES_PATH})",
                     file=sys.stderr,
                 )
             else:
-                print(f"⚠️ プレイリスト情報の取得に失敗しました。\n{stderr_msg}", file=sys.stderr)
+                print(
+                    f"WARNING: failed to fetch playlist info.\n{stderr_msg}",
+                    file=sys.stderr,
+                )
     except subprocess.TimeoutExpired:
-        print("⚠️ プレイリスト情報の取得がタイムアウトしました。", file=sys.stderr)
+        print("WARNING: fetching playlist info timed out.", file=sys.stderr)
 
     # mpv で再生
-    print("\n再生中... q で停止")
+    print("\nPlaying... press q to stop")
     log_dir = Path.home() / "log"
     log_dir.mkdir(exist_ok=True)
     log_file = log_dir / f"mpv_{datetime.now():%Y%m%d_%H%M}.log"
@@ -313,26 +331,28 @@ def cmd_play(args: argparse.Namespace) -> None:
 # メイン
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="ytm",
-        description="YouTube Music CLI ユーティリティ",
+        description="YouTube Music CLI utility",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # playlists
-    p_pl = subparsers.add_parser("playlists", help="プレイリスト一覧を表示")
+    p_pl = subparsers.add_parser("playlists", help="List playlists")
     p_pl.add_argument(
-        "--export", action="store_true",
-        help="シェル変数エクスポート形式で出力 (eval $(ytm playlists --export) で利用)",
+        "--export",
+        action="store_true",
+        help="Output in shell export format (use with: eval $(ytm playlists --export))",
     )
     p_pl.set_defaults(func=cmd_playlists)
 
     # play
-    p_play = subparsers.add_parser("play", help="プレイリストをシャッフル音声再生")
+    p_play = subparsers.add_parser("play", help="Play a playlist as shuffled audio")
     p_play.add_argument(
         "playlist",
-        help="プレイリスト ID（PL で始まる文字列）、プレイリスト名（Shell_Varname 形式または元タイトル）",
+        help="Playlist ID (string starting with PL) or playlist name (Shell_Varname form or original title)",
     )
     p_play.set_defaults(func=cmd_play)
 

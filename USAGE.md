@@ -56,10 +56,10 @@ eval $(./ytm playlists --export)
 名前で解決された場合、どのプレイリストが選ばれたかが stderr に表示される:
 
 ```
-🎵 プレイリスト解決: "My Playlist" (PLxxxxxxxxxxxxxxxx)
+Resolved playlist: "My Playlist" (PLxxxxxxxxxxxxxxxx)
 ```
 
-一致するプレイリストがない場合、利用可能なプレイリスト一覧がエラーとともに表示される。
+一致するプレイリストがない場合、`Error: no playlist matches "..."` と利用可能なプレイリスト一覧（`Available playlists:`）が表示される。
 
 ## Shell_Varname の命名規則
 
@@ -82,7 +82,7 @@ eval $(./ytm playlists --export)
 # 出力例:
 #   YTM_MY_PLAYLIST                          PLxxxxxxxxxxxxxxxx
 #   YTM_FAVORITES                            PLyyyyyyyyyyyyyyyyyy
-#   合計: 2 件
+#   Sum: 2 Playlists
 
 # 好きな方法で再生
 ./ytm play YTM_MY_PLAYLIST

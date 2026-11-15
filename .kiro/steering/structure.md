@@ -33,7 +33,8 @@
 
 ## コードスタイル
 
-- 日本語のドキュメント文字列・コメント・エラーメッセージ
+- 日本語のドキュメント文字列・コメント
+- 画面・stderr への出力メッセージ（エラー・警告・ヘルプ文を含む）は英語。文字化け防止のため絵文字・全角記号などの非 ASCII 文字も使わない（警告は `WARNING:` 接頭辞）
 - 関数名・変数名は英語（Python標準の snake_case）
 - 内部用の関数・定数は `_` プレフィックス（例: `_get_env`, `_cookies_args`, `_check_ytdlp_version`, `_print_resolved`）。サブコマンド実装は `cmd_` プレフィックス（`cmd_playlists`, `cmd_play`）
 - エラー出力は `sys.stderr` に出力し、`sys.exit(1)` で終了

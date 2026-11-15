@@ -283,6 +283,6 @@ def test_help_text_mentions_playlist_name():
         capture_output=True, text=True,
     )
     assert result.returncode == 0
-    assert "プレイリスト名" in result.stdout or \
+    assert "playlist name" in result.stdout or \
            "Shell_Varname" in result.stdout or \
-           "元タイトル" in result.stdout
+           "original title" in result.stdout
